@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+
+<context:annotation-config />
+	<context:component-scan base-package="com.shc.ecom" />
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="locations">
+			<list>
+				<value>classpath:/storm-python-config.properties</value>
+			</list>
+		</property>
+	</bean>
+    	<!-- ********************************************************************************************************************** -->
+	<!-- ************************************ TOPOLOGY SUBMITTER ************************************************************** -->
+	<!-- ********************************************************************************************************************** --> 
+
+	<bean id="localTopologySubmitter" class="com.bny.ppe.runner.LocalTopologySubmitter" />	
+	<bean id="clusterTopologySubmitter" class="com.bny.common.storm.topology.TopologySubmitter" />
+	
+	<!-- *********************************************************************************************************************** -->
+	<!-- ************************************ TOPOLOGY SUBMISSION ************************************************************** -->
+	<!-- *********************************************************************************************************************** --> 
+
+	<bean id="stormPythonTopologySubmission" class="com.bny.common.storm.topology.SingleTopologySubmission" 
+		p:config-ref="topoconfig">
+			<constructor-arg value="stormPythonTopology" />
+			<constructor-arg ref="stormPythonTopology" />
+	</bean>
+	
+	<!-- *********************************************************************************************************************** -->
+	<!-- ************************************ TOPOLOGY CONFIG ************************************************************** -->
+	<!-- *********************************************************************************************************************** --> 
+	<util:map id="topoconfig" map-class="java.util.HashMap" key-type="java.lang.String" >
+   			<entry key="topology.message.timeout.secs" value-ref="topotimeoutSec" />
+   			<entry key="topology.enable.message.timeouts" value-ref="topotimeoutEnable" />
+   			<entry key="topology.workers" value-ref="workernum"/>
+   	
+   	</util:map>
+   	<bean id="topotimeoutEnable" class="java.lang.Boolean">
+		<constructor-arg value="${storm.python.topo.timeout.enable}" />   		
+   	</bean>
+   	<bean id="topotimeoutSec" class="java.lang.Long">
+		<constructor-arg value="${storm.python.topo.timeout.sec}" />   		
+   	</bean>
+   	 <bean id="workernum" class="java.lang.Long">
+		<constructor-arg value="${storm.python.topo.worker.num}" />   		
+   	</bean>
+	<!-- **************************************************************************************************** -->
+	<!--                                   TOPOLOGY / SPOUTS /BOLTS                                           -->
+	<!-- **************************************************************************************************** -->
+
+	<bean id="stormPythonTopology" class="com.bny.common.storm.topology.TopologyFactory">
+		<constructor-arg ref="topologySpoutList" />
+		<constructor-arg ref="topologyBoltList" />
+	</bean>
+
+	<util:list id="topologySpoutList">
+	 	<bean id="randomSentenceSpout" class="com.bny.ppe.spouts.RandomSentenceSpout"
+	    	p:parallelismHint="${randomSentence.spout.threads}">
+			<constructor-arg value="randomSentenceSpout" />
+		</bean>
+	</util:list>
+	
+	<util:list id="topologyBoltList">
+	    <bean id="splitSentence" class="com.bny.ppe.bolts.SplitSentence"
+	    	p:parallelismHint="${splitSentence.bolt.threads}" 
+			p:boltGroupings-ref="splitSentenceGroupingList">
+			<constructor-arg value="splitSentence" />		
+		</bean> 
+		<!-- <bean id="gbMetaRefreshBolt" class="com.shc.ecom.rt.mp.contentoffer.bolt.CacheRefreshBolt"
+	    	p:parallelismHint="${gb.meta.refresh.bolt.threads}" 
+			p:boltGroupings-ref="cacheRefreshGrouping">
+			<constructor-arg value="gbMetaRefreshBolt" />
+		</bean> -->
+	</util:list>
+	
+	<!-- ******************************************************************************************************************** -->
+	<!-- ************************************ Bolt Groupings DEFINITION ***************************************************** -->
+	<!-- ******************************************************************************************************************** -->
+	<util:list id="splitSentenceGroupingList">
+		<bean id="splitSentenceGrouping" class="com.bny.common.storm.components.grouping.ShuffleBoltGrouping">
+			<constructor-arg value="randomSentenceSpout" />
+		</bean>
+	</util:list>
+	 
+
+</beans>
