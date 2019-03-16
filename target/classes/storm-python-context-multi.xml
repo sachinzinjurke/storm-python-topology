@@ -56,6 +56,12 @@
 		<entry key="topology.workers" value-ref="workernum" />
 
 	</util:map>
+	<util:map id="envMap" map-class="java.util.HashMap"
+		key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="PYTHONPATH"
+			value-ref="pythonpath" />
+
+	</util:map>
 	<bean id="topotimeoutEnable" class="java.lang.Boolean">
 		<constructor-arg
 			value="${storm.python.topo.timeout.enable}" />
@@ -68,6 +74,12 @@
 		<constructor-arg
 			value="${storm.python.topo.worker.num}" />
 	</bean>
+	
+	<bean id="pythonpath" class="java.lang.String">
+		<constructor-arg
+			value="${storm.python.path}" />
+	</bean>
+	
 	<!-- **************************************************************************************************** -->
 	<!-- TOPOLOGY / SPOUTS /BOLTS -->
 	<!-- **************************************************************************************************** -->
@@ -96,6 +108,12 @@
 			class="com.bny.common.storm.components.bolt.RichBolt"
 			c:componentId="splitSentence" c:stormBolt-ref="splitSentenceImpl"
 			p:boltGroupings-ref="splitSentenceGrouping" p:parallelismHint="1" />
+			
+			<!-- <bean id="splitSentence"
+			class="com.bny.common.storm.components.bolt.RichBolt"
+			c:componentId="splitSentencePython" c:stormBolt-ref="splitSentencePythonImpl"
+			p:boltGroupings-ref="splitSentenceGrouping" p:parallelismHint="1" /> -->
+			
 	</util:list>
 
 	<!-- ******************************************************************************************************************** -->
@@ -108,5 +126,6 @@
 
 	<bean id="splitSentenceImpl" class="com.bny.ppe.bolts.SplitSentence" />
 	<bean id="randomSentenceSpoutImpl" class="com.bny.ppe.spouts.RandomSentenceSpout" />
+	<bean id="splitSentencePythonImpl" class="com.bny.ppe.bolts.PythonBolt"  p:env-ref="envMap"/>
 
 </beans>
