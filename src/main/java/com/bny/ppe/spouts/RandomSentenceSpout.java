@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bny.common.storm.components.spouts.GenericSpout;
-import com.bny.ppe.bolts.SplitSentence;
 
 public class RandomSentenceSpout extends GenericSpout implements IRichSpout {
 
@@ -57,7 +56,7 @@ public class RandomSentenceSpout extends GenericSpout implements IRichSpout {
 
 	public void nextTuple() {
 		// TODO Auto-generated method stub
-		//Utils.sleep(100);
+		Utils.sleep(100);
 		String[] sentences = new String[] { sentence("the cow jumped over the moon"),
 				sentence("an apple a day keeps the doctor away"), sentence("four score and seven years ago"),
 				sentence("snow white and the seven dwarfs"), sentence("i am at two with nature") };

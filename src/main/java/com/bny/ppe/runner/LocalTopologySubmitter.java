@@ -68,23 +68,9 @@ public final class LocalTopologySubmitter {
 		final LocalTopologySubmitter localTopologySubmitter = (LocalTopologySubmitter) context.getBean("localTopologySubmitter");
 		localTopologySubmitter.submitTopologies(cluster, topologySubmission, topologyName);
 
-		/*try {
-			submitTopologies(topologySubmission);
-		} catch (AlreadyAliveException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error("error:", e);
-		} catch (InvalidTopologyException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error("error:", e);
-		}*/
-
+		
 		LOGGER.info("*************************Cluster Started*************************");
-		Utils.sleep(runtime); // Let run for a bit
-		try {
-			Thread.sleep(runtime);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Utils.sleep(40000); // Let run for a bit
 		LOGGER.info("*************************Started Cluster Shutdown*************************");
 		localTopologySubmitter.killTopologies(cluster, topologySubmission);
 		cluster.shutdown();

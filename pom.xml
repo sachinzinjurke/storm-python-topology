@@ -9,7 +9,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<storm.version>1.1.0</storm.version>
+		<storm.version>1.2.2</storm.version>
 		<maven.surefire.plugin.version>2.12.4</maven.surefire.plugin.version>
 	</properties>
 
@@ -18,7 +18,10 @@
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-core</artifactId>
 			<version>${storm.version}</version>
-			<scope>provided</scope>
+			<!-- <scope>provided</scope>
+			While running locally comment out this line
+			
+			 -->
 		</dependency>
 
 		<dependency>
@@ -29,10 +32,20 @@
 		<dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>multilang-python</artifactId>
-			<version>1.1.0</version>
+			<version>${storm.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>test/main/test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>${basedir}/multilang</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -40,8 +53,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.3.2</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>1.8</source>
+						<target>1.8</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -92,7 +105,7 @@
 								</transformer>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.shc.ecom.common.storm.topology.TopologySubmitter</mainClass>
+									<mainClass>com.bny.ppe.runner.LocalTopologySubmitter.LocalTopologySubmitter()</mainClass>
 								</transformer>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
